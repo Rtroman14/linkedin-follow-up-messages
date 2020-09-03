@@ -1,23 +1,26 @@
 module.exports = (csvData) => {
     let newData = [];
-
-    csvData.forEach(async (row, index) => {
+    let contactNames = [];
+    const client = "Tony Poole";
+    csvData.forEach((rowOutter) => {
         let contact = {};
-        let from = row[0];
-        let to = row[1];
-        let date = row[2];
-        let direction = row[5];
-
-        if (direction === "OUTGOING") {
-            await csvData.forEach(async (record) => {
-                let fromName = record[0];
-                let dateTime = record[2];
-
-                if (to == fromName && date > dateTime) {
-                    contact.name = fromName;
-                    contact.date = date;
-                    await newData.push(contact);
-                    return;
+        let fromOutter = rowOutter[2];
+        let toOutter = rowOutter[3];
+        let dateOutter = rowOutter[4];
+        // client sent message to contact
+        if (fromOutter === client && !contactNames.includes(toOutter)) {
+            csvData.forEach((rowInner) => {
+                let dateInner = rowInner[4];
+                let fromInner = rowInner[2];
+                let toInner = rowInner[3];
+                if (dateInner < dateOutter) {
+                    // if contact sent message to client
+                    if (toOutter === fromInner && !contactNames.includes(toOutter)) {
+                        contact.name = toOutter;
+                        contact.date = dateOutter.slice(0, 10);
+                        contactNames.push(toOutter);
+                        newData.push(contact);
+                    }
                 }
             });
         }
